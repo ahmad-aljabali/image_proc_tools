@@ -1,7 +1,7 @@
 '''
 Matrix formats
 
-K (intrensic camera_matrix)= 
+K (intrensic camera_matrix)=
 [fx   0   cx]
 [0    fy  cy]
 [0    0   1 ]
@@ -50,17 +50,17 @@ Q =np.array([
 # Left Camera
 KL =
 
-DL = 
+DL =
 
-RL = 
+RL =
 
-PL = 
+PL =
 
 # Right Camera
-KR = 
+KR =
 
-DR = 
+DR =
 
-RR = 
+RR =
 
-PR = 
+PR =

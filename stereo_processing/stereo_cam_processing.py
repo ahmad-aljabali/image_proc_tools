@@ -1,28 +1,33 @@
-# this is intended for use with ros "stereo_image_proc"
 #!/usr/bin/env python
+# this script is intended for use with ros "stereo_image_proc"
 import cv2
 import rospy
 
 from sensor_msgs.msg import Image, CameraInfo
 from cv_bridge import CvBridge, CvBridgeError
 from stereo_msgs.msg import DisparityImage
-#define or import Q (reprojection matrix for the stereo camera) 
 
 
 def process():
-    global color_availability, hsv
+    global color_availability,hsv
     color_availability = False
+    hsv = cv2.cvtColor(color, cv2.COLOR_BGR2HSV)
+
+    #put processing code from here
+
+
+    #to here
 
     cv2.imshow('depth', depth)
-
     cv2.imshow('color', color)
-    cv2.waitKey(1)
+    k = cv2.waitKey(1)
+    if k==ord('q'):
+        pass
 
 
 def depthCB(data):
     global depth
-    disp_real = bridge.imgmsg_to_cv2(data.image, desired_encoding="passthrough")
-    depth = cv2.reprojectImageTo3D(disp_real, Q, handleMissingValues=True)
+    depth = bridge.imgmsg_to_cv2(data, desired_encoding="passthrough")
     if color_availability:
         process()
 
@@ -43,7 +48,7 @@ hsv = None
 
 rospy.init_node("stereo_processing")
 
-rospy.Subscriber("/stereo/disparity", DisparityImage, depthCB)
+rospy.Subscriber("/stereo/world_pts", Image, depthCB)
 rospy.Subscriber("/stereo/left/image_rect_color", Image, colorCB)
 
 
