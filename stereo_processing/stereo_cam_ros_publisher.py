@@ -1,26 +1,32 @@
 #!/usr/bin/env python
-# this script is intended to be used with ROS stereo_image_proc
+# this script is intended to be used with ROS "stereo_image_proc" package
 import cv2
 import rospy
 from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image, CameraInfo
 from stereo_msgs.msg import DisparityImage
-#assuems a calibration result file in the format provided in this repository
+#assuems a calibration file in the format provided in this repository (stereo_calibration.py)
 from stereo_calibration import *
+
+cam_name = 'stereo'
 
 def callback(data):
     disparity = bridge.imgmsg_to_cv2(data.image, desired_encoding="passthrough")
+    # convert disparity image to a reprojection of world pts (x,y,z)
+    # handleMissingValues will give large "z" values for pixels with missing disparity to be easily masked out
     world_pts = cv2.reprojectImageTo3D(disparity, Q,handleMissingValues=True)
     world_pts_pub.publish(bridge.cv2_to_imgmsg(world_pts, "passthrough"))
 
-rospy.init_node("stereo")
-imgL_pub = rospy.Publisher("/stereo/left/image_raw",Image, queue_size=10)
-imgR_pub = rospy.Publisher("/stereo/right/image_raw",Image, queue_size=10)
-camL_pub = rospy.Publisher("/stereo/left/camera_info",CameraInfo, queue_size=10)
-camR_pub = rospy.Publisher("/stereo/right/camera_info",CameraInfo, queue_size=10)
+# init ros node, publishers & camera infor messages for left and right cameras
+rospy.init_node(cam_name)
+imgL_pub = rospy.Publisher("/" + cam_name + "/left/image_raw",Image, queue_size=10)
+imgR_pub = rospy.Publisher("/" + cam_name + "/right/image_raw",Image, queue_size=10)
+camL_pub = rospy.Publisher("/" + cam_name + "/left/camera_info",CameraInfo, queue_size=10)
+camR_pub = rospy.Publisher("/" + cam_name + "/right/camera_info",CameraInfo, queue_size=10)
 
-world_pts_pub = rospy.Publisher("/stereo/world_pts",Image, queue_size=10)
-rospy.Subscriber("/stereo/disparity", DisparityImage, callback)
+world_pts_pub = rospy.Publisher("/" + cam_name + "/world_pts",Image, queue_size=10)
+# disparity is published by ros "stereo_image_proc" package
+rospy.Subscriber("/" + cam_name + "/disparity", DisparityImage, callback)
 
 bridge = CvBridge()
 
@@ -43,6 +49,7 @@ cam_infoR.R = RR
 cam_infoR.P = PR
 
 cap = cv2.VideoCapture(0)
+# to insure the camera is running in the calibration resolution
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAMERA_WIDTH)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, CAMERA_HEIGHT)
 
@@ -53,7 +60,7 @@ while True:
 
     if frame != None:
         height, width, channels = frame.shape
-        #assuems both cameras are read in 1 frame therefor seperate the camera frames
+        #assuems both cameras are read in 1 frame therefor seperate lesft & right
         frameL=frame[0:height,0:width/2]
         frameR=frame[0:height,width/2:width]
 
