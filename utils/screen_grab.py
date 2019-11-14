@@ -1,5 +1,4 @@
 import numpy as np
-import cv2
 import mss
 
 monitor = {"top": 40, "left": 0, "width": 800, "height": 640}

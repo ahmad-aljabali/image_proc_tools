@@ -9,16 +9,15 @@ def color_mask(frame,colors):
     mask=None
 
     for color in colors:
-
         #in case of multiple ranges given for a color itirate for every range and compine all masks
         for r in color:
-            #add the new color range mask to the total mask
+            #first color mask
             if first == True:
                 mask = cv2.inRange(frame, r[0], r[1])
                 mask = cv2.erode(mask,kernel_size)
                 mask = cv2.dilate(mask,kernel_size)
                 first=False
-            #first color range mask
+            #add the new mask to the total mask
             else:
                 mask_it = cv2.inRange(frame, r[0], r[1])
                 mask_it = cv2.erode(mask_it,kernel_size)
