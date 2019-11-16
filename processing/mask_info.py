@@ -8,7 +8,6 @@ def mask_info(mask):
     approx= []
     bbox = []
     centroids= []
-    first=True
 
     # find contours from the mask
     contours,hierarchy = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -28,11 +27,9 @@ def mask_info(mask):
         (x,y,w,h) = cv2.boundingRect(a)
         bbox.append((x,y,w,h))
 
-        # compute the centroid of the contour & bounding box
+        # compute the centroid of the contour bounding box
         bX = int(w/2)+x
         bY = int(h/2)+y
-
-        #add contour center to centers array
         centroids.append((bX,bY))
 
 
