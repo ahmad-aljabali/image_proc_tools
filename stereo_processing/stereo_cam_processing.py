@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# this script is intended for use with ros "stereo_image_proc" package
 import cv2
 import rospy
 from cv_bridge import CvBridge, CvBridgeError
